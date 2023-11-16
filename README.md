@@ -903,3 +903,16 @@ Dive deeper into JDBC concepts and techniques through the following resources:
 - [Effective JDBC: Writing Fast, Secure, and Maintainable Code - Oracle Developers Blog](https://blogs.oracle.com/developers/effective-jdbc-writing-fast-secure-maintainable-code)
 
 These resources provide valuable insights, examples, and tips for mastering JDBC and building robust database-driven applications.
+
+## About the Author
+
+**Mohamed Refat**
+Backend Engineer 
+
+I'm currently on a journey to master backend development. Passionate about building robust and scalable systems, I'm diving into the world of server-side scripting, database management, and API development.
+
+Connect with me on:
+- [LinkedIn](https://www.linkedin.com/in/mohamed-refat-270686201/)
+- [Portfolio](https://mohammed-refat.github.io/Portfolio/))
+
+Feel free to reach out with any questions or comments.
