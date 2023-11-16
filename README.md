@@ -473,3 +473,324 @@ The `CallableStatement` interface extends `PreparedStatement` and is specificall
     ```
 
 In summary, `PreparedStatement` and `CallableStatement` offer enhanced functionality and performance benefits over basic `Statement` when interacting with databases. They provide a safer and more efficient way to execute SQL queries, especially in scenarios involving parameterized queries and stored procedures. In the following sections, we will explore more advanced JDBC features, including transaction management and handling large datasets.
+
+
+Certainly! Let's add the "Transaction Management," "Exception Handling," and "Connection Pooling" sections to your JDBC repository. Below are Markdown templates for each section:
+
+Certainly! Let's add the "Transaction Management," "Exception Handling," and "Connection Pooling" sections to your JDBC repository. Below are Markdown templates for each section:
+
+### Transaction Management:
+
+#### Overview:
+
+Transaction management is a critical aspect of database interactions, ensuring that a series of operations are executed as a single unit. JDBC provides mechanisms for managing transactions using the `Connection` interface. Key components of transaction management include:
+
+1. **Begin Transaction:**
+   - To start a transaction, you can use the `setAutoCommit(false)` method on the `Connection` object. This sets the auto-commit mode to false, indicating that a series of SQL statements should be grouped into a transaction.
+
+    ```java
+    // Start a transaction
+    connection.setAutoCommit(false);
+    ```
+
+2. **Commit Transaction:**
+   - To commit the changes made during the transaction to the database, use the `commit()` method.
+
+    ```java
+    // Commit the transaction
+    connection.commit();
+    ```
+
+3. **Rollback Transaction:**
+   - If an error occurs or if you need to undo the changes made during the transaction, use the `rollback()` method.
+
+    ```java
+    // Rollback the transaction
+    connection.rollback();
+    ```
+
+#### Example:
+
+Here's an example demonstrating transaction management in JDBC:
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class TransactionExample {
+    public static void main(String[] args) {
+        // JDBC URL, username, and password of MySQL server
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String user = "your_username";
+        String password = "your_password";
+
+        try {
+            // Load the JDBC driver and establish a connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, user, password);
+
+            try {
+                // Start a transaction
+                connection.setAutoCommit(false);
+
+                // Perform database operations within the transaction
+                // ...
+
+                // Commit the transaction
+                connection.commit();
+            } catch (SQLException e) {
+                // Handle exceptions and roll back the transaction
+                connection.rollback();
+                e.printStackTrace();
+            } finally {
+                // Set auto-commit mode to true after completing the transaction
+                connection.setAutoCommit(true);
+                // Close the connection
+                connection.close();
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+In this example, replace "your_database," "your_username," and "your_password" with your actual database details.
+
+### Exception Handling:
+
+#### Best Practices:
+
+Exception handling is crucial for robust JDBC applications. Follow these best practices to effectively handle exceptions in your JDBC code:
+
+1. **Catch Specific Exceptions:**
+   - Catch specific `SQLException` instances to handle database-related errors. This allows you to provide specific error messages or take appropriate actions based on the type of exception.
+
+    ```java
+    try {
+        // JDBC code
+    } catch (SQLException e) {
+        // Handle SQLException
+        e.printStackTrace();
+    }
+    ```
+
+2. **Logging:**
+   - Use logging frameworks like SLF4J or java.util.logging to log detailed information about exceptions. This helps in diagnosing issues during development and production.
+
+    ```java
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+
+    // Logger instantiation
+    private static final Logger logger = LoggerFactory.getLogger(YourClass.class);
+
+    try {
+        // JDBC code
+    } catch (SQLException e) {
+        // Log exception details
+        logger.error("Error executing JDBC code", e);
+    }
+    ```
+
+3. **Handle Resources Properly:**
+   - Always close JDBC resources such as `Connection`, `Statement`, and `ResultSet` in a `finally` block to ensure resource cleanup, even in the presence of exceptions.
+
+    ```java
+    Connection connection = null;
+    try {
+        // JDBC code
+    } catch (SQLException e) {
+        // Handle SQLException
+        e.printStackTrace();
+    } finally {
+        // Close resources in the finally block
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    ```
+
+#### Example:
+
+Here's an example demonstrating exception handling best practices in JDBC:
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ExceptionHandlingExample {
+    public static void main(String[] args) {
+        // JDBC URL, username, and password of MySQL server
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String user = "your_username";
+        String password = "your_password";
+
+        Connection connection = null;
+        try {
+            // Load the JDBC driver and establish a connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(url, user, password);
+
+            // JDBC code that may throw SQLException
+            // ...
+        } catch (ClassNotFoundException | SQLException e) {
+            // Handle exceptions
+            e.printStackTrace();
+        } finally {
+            // Close the connection in the finally block
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+Replace "your_database," "your_username," and "your_password" with your actual database details.
+
+
+Certainly! Let's add the "Connection Pooling" and "Advanced Topics" sections to your JDBC repository. Below are Markdown templates for each section:
+
+### Connection Pooling:
+
+#### Introduction:
+
+Connection pooling is a technique used to efficiently manage database connections in JDBC applications. It involves reusing existing database connections instead of creating new ones for each request, reducing the overhead of connection creation. Key benefits of connection pooling include:
+
+1. **Performance Improvement:**
+   - Connection pooling significantly improves performance by avoiding the overhead of establishing new connections for each database operation. Reusing existing connections reduces the time spent on connection setup.
+
+2. **Resource Management:**
+   - Connection pooling ensures proper resource management by handling the opening and closing of connections. This helps prevent resource leaks and improves the overall stability of the application.
+
+3. **Concurrency:**
+   - In multi-user environments, connection pooling allows multiple users to share a pool of connections. This improves concurrency and scalability, as the application can efficiently manage a larger number of concurrent requests.
+
+#### Example:
+
+While various connection pooling libraries are available (such as Apache DBCP, HikariCP, and C3P0), here's a simplified example using the HikariCP library:
+
+```java
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public class ConnectionPoolingExample {
+    public static void main(String[] args) {
+        // HikariCP configuration
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/your_database");
+        config.setUsername("your_username");
+        config.setPassword("your_password");
+        config.setMaximumPoolSize(10);
+
+        // Create a HikariDataSource
+        HikariDataSource dataSource = new HikariDataSource(config);
+
+        try (Connection connection = dataSource.getConnection()) {
+            // Perform database operations using the connection
+            // ...
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the HikariDataSource
+            dataSource.close();
+        }
+    }
+}
+```
+
+Replace "your_database," "your_username," and "your_password" with your actual database details.
+
+### Advanced Topics:
+
+#### Overview:
+
+Advanced JDBC features provide additional capabilities for handling complex scenarios and optimizing database interactions. Explore the following advanced topics:
+
+1. **Batch Processing:**
+   - Batch processing allows you to execute multiple SQL statements in a single batch, reducing the number of round-trips between the application and the database. This is especially beneficial when dealing with multiple data inserts, updates, or deletes.
+
+2. **Stored Procedures:**
+   - Stored procedures are precompiled SQL routines stored in the database. JDBC provides support for calling and executing stored procedures, enabling encapsulation of complex logic within the database.
+
+    ```java
+    String procedureCall = "{CALL your_stored_procedure(?, ?)}";
+    CallableStatement callableStatement = connection.prepareCall(procedureCall);
+    // Set parameters and execute
+    ```
+
+3. **Handling Large Datasets:**
+   - When dealing with large result sets, consider using pagination or streaming to efficiently process data without loading the entire dataset into memory. This is essential for applications dealing with substantial amounts of data.
+
+#### Example:
+
+Here's a simplified example showcasing batch processing and calling a stored procedure in JDBC:
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class AdvancedTopicsExample {
+    public static void main(String[] args) {
+        // JDBC URL, username, and password of MySQL server
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String user = "your_username";
+        String password = "your_password";
+
+        try {
+            // Load the JDBC driver and establish a connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, user, password);
+
+            // Batch Processing Example
+            String insertQuery = "INSERT INTO your_table (id, name) VALUES (?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+
+            for (int i = 1; i <= 10; i++) {
+                preparedStatement.setInt(1, i);
+                preparedStatement.setString(2, "Name" + i);
+                preparedStatement.addBatch();
+            }
+
+            int[] batchResult = preparedStatement.executeBatch();
+
+            // Calling a Stored Procedure Example
+            String procedureCall = "{CALL your_stored_procedure(?, ?)}";
+            CallableStatement callableStatement = connection.prepareCall(procedureCall);
+
+            // Set parameters
+            callableStatement.setInt(1, inputParameter1);
+            callableStatement.setString(2, inputParameter2);
+
+            boolean hasResults = callableStatement.execute();
+
+            // Process result sets or output parameters
+
+            // Close resources
+            preparedStatement.close();
+            callableStatement.close();
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+Replace "your_database," "your_username," and "your_password" with your actual database details. Adjust the batch processing and stored procedure examples based on your application's specific requirements.
