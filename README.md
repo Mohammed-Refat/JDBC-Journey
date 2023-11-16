@@ -913,6 +913,6 @@ I'm currently on a journey to master backend development. Passionate about build
 
 Connect with me on:
 - [LinkedIn](https://www.linkedin.com/in/mohamed-refat-270686201/)
-- [Portfolio](https://mohammed-refat.github.io/Portfolio/))
+- [Portfolio](https://mohammed-refat.github.io/Portfolio/)
 
 Feel free to reach out with any questions or comments.
